@@ -6,11 +6,12 @@ import "os" // want +3 "blank line in the import block"
 // A comment does not excuse the blank lines after it, and a run of them is
 // reported once.
 
+
 import "strings"
 import ( // want "grouped imports"
-	"errors" // want +1 "blank line in the import block"
+    "errors" // want +1 "blank line in the import block"
 
-	"io"
+    "io"
 )
 
 var _ = fmt.Sprint

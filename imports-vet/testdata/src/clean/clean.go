@@ -4,7 +4,6 @@ package clean
 
 // The first import's doc comment sits above the block.
 import "fmt"
-
 // A comment between two imports is not a blank line.
 import "os"
 import str "strings" // a trailing comment
@@ -18,5 +17,5 @@ var _ = str.ToLower
 
 func f() {
 
-	_ = 1
+    _ = 1
 }

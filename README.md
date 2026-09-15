@@ -163,5 +163,8 @@ CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) builds, vets and
 tests the module on Go 1.25 and the latest stable Go. It also runs both tools
 over this repository, installed the same way as above.
 
-The code is indented with 4 spaces rather than gofmt's tabs, so `gofmt -l` lists
-every file on purpose.
+**Don't reformat the files under `testdata/`.** They are deliberately badly
+formatted: same-line imports, runs of blank lines, `// want` comments on exact
+lines. gofmt, or an IDE's reformat or optimize-imports on commit, rewrites them
+and breaks the tests. `go vet ./...` never reads `testdata`, so the fixtures
+can't fail the vet steps. They only fail `go test`.
