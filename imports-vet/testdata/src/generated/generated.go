@@ -3,9 +3,9 @@
 package generated
 
 import (
-	"fmt"
+    "fmt"
 
-	"os"
+    "os"
 )
 
 var _ = fmt.Sprint

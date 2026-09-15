@@ -3,7 +3,7 @@
 package generated
 
 func f() {
-	// a comment
+    // a comment
 
-	_ = 1
+    _ = 1
 }
