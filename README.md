@@ -8,8 +8,9 @@ to run in any project.
 | --- | --- |
 | [`imports-vet`](imports-vet/main.go) | Each import has its own `import` keyword and its own line, with no blank line between the first import and the last |
 | [`funcbody-vet`](funcbody-vet/main.go) | No blank lines and no comments inside function bodies |
+| [`vardecl-vet`](vardecl-vet/README.md) | Every variable is declared with the `var` keyword, not `:=`, wherever Go allows it |
 
-Both skip generated files (those with a `// Code generated ... DO NOT EDIT.` header).
+All of them skip generated files (those with a `// Code generated ... DO NOT EDIT.` header).
 
 ## imports-vet
 
@@ -57,6 +58,21 @@ What counts as inside a body:
 - A doc comment, a comment after the closing `}`, and a blank line in a
   parameter list that spans several lines are all outside the body.
 
+## vardecl-vet
+
+Reports every `:=` that could be written with `var`. It allows `:=` where Go
+doesn't allow `var`: `for`, `range`, `if` and `switch` headers, type switches
+and `select` cases. It also allows a `:=` that reuses a variable already
+declared in the same scope.
+
+```go
+a := f()              // short variable declaration: declare it with the var keyword
+var b = f()           // fine
+for i := range s {}   // fine: var isn't allowed here
+```
+
+See [vardecl-vet/README.md](vardecl-vet/README.md) for the full rules.
+
 ## Using the tools in your project
 
 ### 1. Install
@@ -64,6 +80,7 @@ What counts as inside a body:
 ```sh
 go install github.com/pin2t/govets/imports-vet@latest
 go install github.com/pin2t/govets/funcbody-vet@latest
+go install github.com/pin2t/govets/vardecl-vet@latest
 ```
 
 This needs Go 1.25 or newer.
@@ -73,6 +90,7 @@ To pin the version in your own `go.mod` instead (Go 1.24+ tool directives):
 ```sh
 go get -tool github.com/pin2t/govets/imports-vet@latest
 go get -tool github.com/pin2t/govets/funcbody-vet@latest
+go get -tool github.com/pin2t/govets/vardecl-vet@latest
 ```
 
 This adds `golang.org/x/tools` to your module graph as an indirect dependency.
@@ -82,6 +100,7 @@ This adds `golang.org/x/tools` to your module graph as an indirect dependency.
 ```sh
 go vet -vettool="$(go env GOPATH)/bin/imports-vet" ./...
 go vet -vettool="$(go env GOPATH)/bin/funcbody-vet" ./...
+go vet -vettool="$(go env GOPATH)/bin/vardecl-vet" ./...
 ```
 
 With the tool directive, let `go tool -n` find the binary for you:
@@ -89,6 +108,7 @@ With the tool directive, let `go tool -n` find the binary for you:
 ```sh
 go vet -vettool="$(go tool -n imports-vet)" ./...
 go vet -vettool="$(go tool -n funcbody-vet)" ./...
+go vet -vettool="$(go tool -n vardecl-vet)" ./...
 ```
 
 Findings look like this, and `go vet` exits with status 1:
@@ -127,9 +147,10 @@ GitHub Actions:
   with:
     go-version: stable
 - run: go vet ./...
-- run: go install github.com/pin2t/govets/imports-vet@latest github.com/pin2t/govets/funcbody-vet@latest
+- run: go install github.com/pin2t/govets/imports-vet@latest github.com/pin2t/govets/funcbody-vet@latest github.com/pin2t/govets/vardecl-vet@latest
 - run: go vet -vettool="$(go env GOPATH)/bin/imports-vet" ./...
 - run: go vet -vettool="$(go env GOPATH)/bin/funcbody-vet" ./...
+- run: go vet -vettool="$(go env GOPATH)/bin/vardecl-vet" ./...
 ```
 
 Replace `@latest` with a commit hash or tag so a new rule doesn't break your
@@ -144,6 +165,7 @@ vet:
 	go vet ./...
 	go vet -vettool=$(GOBIN)/imports-vet ./...
 	go vet -vettool=$(GOBIN)/funcbody-vet ./...
+	go vet -vettool=$(GOBIN)/vardecl-vet ./...
 ```
 
 ## Development
@@ -160,7 +182,7 @@ with a line offset instead: `// want +3 "..."` expects the finding three lines
 below the comment.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) builds, vets and
-tests the module on Go 1.25 and the latest stable Go. It also runs both tools
+tests the module on Go 1.25 and the latest stable Go. It also runs all the tools
 over this repository, installed the same way as above.
 
 **Don't reformat the files under `testdata/`.** They are deliberately badly
