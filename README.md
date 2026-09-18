@@ -6,10 +6,10 @@ to run in any project.
 
 | Tool | What it enforces |
 | --- | --- |
-| [`imports-vet`](imports-vet/main.go) | Each import has its own `import` keyword and its own line, with no blank line between the first import and the last |
+| [`imports-vet`](imports-vet/main.go) | Each import has its own `import` keyword and its own line,<br>with no blank line between the first import and the last |
 | [`funcbody-vet`](funcbody-vet/main.go) | No blank lines and no comments inside function bodies |
-| [`vardecl-vet`](vardecl-vet/README.md) | Every variable is declared with the `var` keyword, not `:=`, wherever Go allows it |
-| [`varname-vet`](varname-vet/README.md) | Variables inside function bodies are named with two camel-case words at most |
+| [`vardecl-vet`](vardecl-vet/README.md) | Every variable is declared with the `var` keyword,<br>not `:=`, wherever Go allows it |
+| [`varname-vet`](varname-vet/README.md) | Variables inside function bodies are named with<br>two camel-case words at most |
 
 All of them skip generated files (those with a `// Code generated ... DO NOT EDIT.` header).
 
