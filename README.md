@@ -1,5 +1,7 @@
 # govets
 
+[![CI](https://github.com/pin2t/govets/actions/workflows/ci.yml/badge.svg)](https://github.com/pin2t/govets/actions/workflows/ci.yml)
+
 Useful vet tools for Go. Each one is a `go/analysis` analyzer built as a
 standalone `go vet -vettool` binary, so it needs nothing but the Go toolchain
 to run in any project.
