@@ -10,6 +10,7 @@ to run in any project.
 | --- | --- |
 | [`imports-vet`](imports-vet/main.go) | Each import has its own `import` keyword and its own line,<br>with no blank line between the first import and the last |
 | [`funcbody-vet`](funcbody-vet/main.go) | No blank lines and no comments inside function bodies |
+| [`groupdecl-vet`](groupdecl-vet/README.md) | `const` and `var` declarations are not grouped:<br>each has its own keyword and line |
 | [`vardecl-vet`](vardecl-vet/README.md) | Every variable is declared with the `var` keyword,<br>not `:=`, wherever Go allows it |
 | [`varname-vet`](varname-vet/README.md) | Variables inside function bodies are named with<br>two camel-case words at most |
 
@@ -61,6 +62,36 @@ What counts as inside a body:
 - A doc comment, a comment after the closing `}`, and a blank line in a
   parameter list that spans several lines are all outside the body.
 
+## groupdecl-vet
+
+Reports every `const` and `var` declaration that sits inside a parenthesized
+group. Each declaration in the group is reported at its own line.
+
+```go
+const (
+    a = 1              // grouped const declaration: give each constant its own const keyword and line
+    b = 2              // grouped const declaration: give each constant its own const keyword and line
+)
+
+var (
+    c = 3              // grouped var declaration: give each variable its own var keyword and line
+)
+```
+
+Write this instead:
+
+```go
+const a = 1
+const b = 2
+
+var c = 3
+```
+
+A group with a single declaration is still a group. `type (...)` and
+`import (...)` blocks aren't checked. The group is reported wherever it sits:
+at package level, inside a function, inside a nested block, or inside a
+function literal.
+
 ## vardecl-vet
 
 Reports every `:=` that could be written with `var`. It allows `:=` where Go
@@ -104,6 +135,7 @@ See [varname-vet/README.md](varname-vet/README.md) for the full rules.
 ```sh
 go install github.com/pin2t/govets/imports-vet@latest
 go install github.com/pin2t/govets/funcbody-vet@latest
+go install github.com/pin2t/govets/groupdecl-vet@latest
 go install github.com/pin2t/govets/vardecl-vet@latest
 go install github.com/pin2t/govets/varname-vet@latest
 ```
@@ -115,6 +147,7 @@ To pin the version in your own `go.mod` instead (Go 1.24+ tool directives):
 ```sh
 go get -tool github.com/pin2t/govets/imports-vet@latest
 go get -tool github.com/pin2t/govets/funcbody-vet@latest
+go get -tool github.com/pin2t/govets/groupdecl-vet@latest
 go get -tool github.com/pin2t/govets/vardecl-vet@latest
 go get -tool github.com/pin2t/govets/varname-vet@latest
 ```
@@ -126,6 +159,7 @@ This adds `golang.org/x/tools` to your module graph as an indirect dependency.
 ```sh
 go vet -vettool="$(go env GOPATH)/bin/imports-vet" ./...
 go vet -vettool="$(go env GOPATH)/bin/funcbody-vet" ./...
+go vet -vettool="$(go env GOPATH)/bin/groupdecl-vet" ./...
 go vet -vettool="$(go env GOPATH)/bin/vardecl-vet" ./...
 go vet -vettool="$(go env GOPATH)/bin/varname-vet" ./...
 ```
@@ -135,6 +169,7 @@ With the tool directive, let `go tool -n` find the binary for you:
 ```sh
 go vet -vettool="$(go tool -n imports-vet)" ./...
 go vet -vettool="$(go tool -n funcbody-vet)" ./...
+go vet -vettool="$(go tool -n groupdecl-vet)" ./...
 go vet -vettool="$(go tool -n vardecl-vet)" ./...
 go vet -vettool="$(go tool -n varname-vet)" ./...
 ```
@@ -175,9 +210,10 @@ GitHub Actions:
   with:
     go-version: stable
 - run: go vet ./...
-- run: go install github.com/pin2t/govets/imports-vet@latest github.com/pin2t/govets/funcbody-vet@latest github.com/pin2t/govets/vardecl-vet@latest github.com/pin2t/govets/varname-vet@latest
+- run: go install github.com/pin2t/govets/imports-vet@latest github.com/pin2t/govets/funcbody-vet@latest github.com/pin2t/govets/groupdecl-vet@latest github.com/pin2t/govets/vardecl-vet@latest github.com/pin2t/govets/varname-vet@latest
 - run: go vet -vettool="$(go env GOPATH)/bin/imports-vet" ./...
 - run: go vet -vettool="$(go env GOPATH)/bin/funcbody-vet" ./...
+- run: go vet -vettool="$(go env GOPATH)/bin/groupdecl-vet" ./...
 - run: go vet -vettool="$(go env GOPATH)/bin/vardecl-vet" ./...
 - run: go vet -vettool="$(go env GOPATH)/bin/varname-vet" ./...
 ```
@@ -194,6 +230,7 @@ vet:
 	go vet ./...
 	go vet -vettool=$(GOBIN)/imports-vet ./...
 	go vet -vettool=$(GOBIN)/funcbody-vet ./...
+	go vet -vettool=$(GOBIN)/groupdecl-vet ./...
 	go vet -vettool=$(GOBIN)/vardecl-vet ./...
 	go vet -vettool=$(GOBIN)/varname-vet ./...
 ```
