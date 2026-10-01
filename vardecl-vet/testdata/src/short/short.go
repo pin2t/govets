@@ -38,3 +38,10 @@ func g(ok bool, ch chan int) {
 	h()
 	_, _, _ = err, x, y
 }
+
+func redeclared() error {
+	var a, err = f()
+	b, err := f() // want "short variable declaration reusing err: declare it with the var keyword and a new name"
+	_, _ = a, b
+	return err
+}
