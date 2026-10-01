@@ -45,13 +45,20 @@ case v, ok := <-ch:                // select case receiving into new variables
 Only the `:=` in the statement's header is allowed. A `:=` in the body of the
 `for`, `if`, `switch` or `select` is reported like any other.
 
-**Redeclaring a variable from the same scope is allowed.** Here `err` already
-exists, so `var n, err = g()` would not compile (`err redeclared in this block`):
+**Redeclaring a variable from the same scope is reported.** Here `err`
+already exists, so `var b, err = g()` would not compile (`err redeclared in
+this block`). Give the reused variable a new name instead:
 
 ```go
-var err error
-// ...
-n, err := g()     // allowed: err is reused, only n is new
+var a, err = f()
+b, err := g()     // short variable declaration reusing err: declare it with the var keyword and a new name
+```
+
+Write this instead:
+
+```go
+var a, err = f()
+var b, berr = g()
 ```
 
 **Shadowing in a nested block is reported.** A `:=` inside a nested block
@@ -128,5 +135,6 @@ Things to know:
   no findings.
 - `short` holds `:=` declarations that must each be reported, each marked with a
   `// want` comment. These include `:=` in the bodies of `if`, `for`, `switch`,
-  `select` and a function literal, and a nested `:=` that shadows an outer name.
+  `select` and a function literal, a nested `:=` that shadows an outer name,
+  and a `:=` that redeclares a variable from the same scope.
 - `generated` holds a generated file that must be skipped.

@@ -11,10 +11,11 @@
 // A short variable declaration is left alone where Go's grammar has no room
 // for var: the init statement of an if, for or switch, a for's range clause, a
 // type switch's x := y.(type), and a select case receiving into new variables.
-// So is one redeclaring a variable from the same scope, like a, err := g()
-// after an earlier err, because var would not compile there. A := inside a
-// nested block that shadows an outer variable declares a new one, and is
-// reported. Generated files are skipped.
+// One redeclaring a variable from the same scope, like b, err := g() after an
+// earlier err, is reported too: var would not compile there, so the reused
+// variables need new names, var b, berr = g(). A := inside a nested block that
+// shadows an outer variable declares a new one, and is reported. Generated
+// files are skipped.
 package main
 
 import "go/ast"
@@ -59,6 +60,7 @@ func run(pass *analysis.Pass) (any, error) {
 				}
 				for _, l := range x.Lhs {
 					if id, ok := l.(*ast.Ident); ok && pass.TypesInfo.Uses[id] != nil {
+						pass.Reportf(x.Pos(), "short variable declaration reusing %s: declare it with the var keyword and a new name", id.Name)
 						return true
 					}
 				}

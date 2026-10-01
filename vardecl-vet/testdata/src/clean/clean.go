@@ -52,9 +52,12 @@ func grammar(s []int, m map[string]int, ch chan int, x any) {
 	}
 }
 
-func redeclared() error {
-	var err error
-	a, err := f()
-	_ = a
+func renamed() error {
+	var a, err = f()
+	var b, berr = f()
+	_, _ = a, b
+	if berr != nil {
+		return berr
+	}
 	return err
 }

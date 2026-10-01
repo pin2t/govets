@@ -96,12 +96,14 @@ function literal.
 
 Reports every `:=` that could be written with `var`. It allows `:=` where Go
 doesn't allow `var`: `for`, `range`, `if` and `switch` headers, type switches
-and `select` cases. It also allows a `:=` that reuses a variable already
-declared in the same scope.
+and `select` cases. A `:=` that reuses a variable already declared in the same
+scope is reported too: give the reused variable a new name.
 
 ```go
 a := f()              // short variable declaration: declare it with the var keyword
-var b = f()           // fine
+var b, err = f()      // fine
+c, err := f()         // short variable declaration reusing err: declare it with the var keyword and a new name
+var d, derr = f()     // fine
 for i := range s {}   // fine: var isn't allowed here
 ```
 
